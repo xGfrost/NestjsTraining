@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import * as httpMock from 'node-mocks-http';
+import { request } from 'https';
+import { Request } from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -9,7 +11,7 @@ describe('UserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       imports: [],
-      providers: []
+providers: []
     }).compile();
 
     controller = module.get<UserController>(UserController);
@@ -30,4 +32,6 @@ describe('UserController', () => {
       title: 'Template Engine',
     })
   }) 
+
+
 });
