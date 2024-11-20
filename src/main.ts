@@ -5,12 +5,16 @@ import * as mustache from 'mustache-express';
 import { NestExpressApplication } from '@nestjs/platform-express';
 // import * as dotenv from 'dotenv';
 import { ConfigService } from '@nestjs/config';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 // dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(cookieParser('RAHASIA'));
+
+  const loggerService = app.get(WINSTON_MODULE_NEST_PROVIDER);
+  app.useLogger(loggerService);
 
   app.set('vires', __dirname + '/../views');
   app.set('view engine', 'html');
