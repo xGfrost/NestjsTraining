@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse, Redirect, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse,HttpException, Redirect, Inject, UseFilters } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { request } from 'http';
 import { UserService } from './user.service';
@@ -7,6 +7,7 @@ import { mailService, MailService } from './../mail/mail.service';
 import { UserRepository } from '../user-repository/user-repository';
 import { MemberService } from '../member/member.service';
 import { User } from '@prisma/client';
+import { ValidationFilter } from 'src/validation/validation.filter';
 
 @Controller('/api/users')
 export class UserController {
@@ -38,10 +39,20 @@ export class UserController {
         @Query('first_name') firstName: string,
         @Query('last_name') lastName: string
     ): Promise<User> {
+        if (!firstName) {
+            throw new HttpException({
+
+                code: 400,
+                errors: "first name is required",
+            },
+            400,
+         )
+        };
         return this.userRepository.save(firstName, lastName);
     }
 
     @Get('/hello')
+    @UseFilters(ValidationFilter)
     async sayHello(
         @Query('name') name: string
     ): Promise<string> {
@@ -57,13 +68,13 @@ export class UserController {
     }
 
     @Get('/set-cookie')
-    setCookie(@Query('name') name: string,@Res() response: Response) {
+    setCookie(@Query('name') name: string, @Res() response: Response) {
         response.cookie('name', name);
         response.status(200).send('Success Set Cookie');
     }
 
     @Get('/get-cookie')
-    getCookie(@Req() request: Request ): string {
+    getCookie(@Req() request: Request): string {
         return request.cookies['name'];
     }
 
@@ -83,7 +94,7 @@ export class UserController {
             url: '/api/users/sample-response',
             statusCode: 301,
         };
-    } 
+    }
 
     @Get("/:id")
     getById(@Param("id") id: string): string {
