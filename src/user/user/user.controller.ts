@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse,HttpException, Redirect, Inject, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse,HttpException, Redirect, Inject, UseFilters, ParseIntPipe, Body, UsePipes } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { request } from 'http';
 import { UserService } from './user.service';
@@ -8,6 +8,9 @@ import { UserRepository } from '../user-repository/user-repository';
 import { MemberService } from '../member/member.service';
 import { User } from '@prisma/client';
 import { ValidationFilter } from 'src/validation/validation.filter';
+import { ValidationPipe } from 'src/validation/validation.pipe';
+import { loginUserRequestValidation } from 'src/model/login.model';
+import { LoginUserRequest } from './../../model/login.model';
 
 @Controller('/api/users')
 export class UserController {
@@ -20,6 +23,13 @@ export class UserController {
         private memberService: MemberService,
     ) {
 
+    }
+
+    @UsePipes(new ValidationPipe(loginUserRequestValidation))
+    @UseFilters(ValidationFilter)
+    @Post('/Login')
+    login(@Query('name') name: string, @Body() request: LoginUserRequest){
+        return `Hello ${request.username}`;
     }
 
     @Get('/connection')
@@ -97,7 +107,7 @@ export class UserController {
     }
 
     @Get("/:id")
-    getById(@Param("id") id: string): string {
+    getById(@Param("id", ParseIntPipe) id: number): string {
         return `GET ${id}`;
     }
 
