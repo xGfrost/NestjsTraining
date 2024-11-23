@@ -26,6 +26,7 @@ async function bootstrap() {
   // app.useGlobalInterceptors()
   // app.useGlobalGuards()
 
+
   app.enableShutdownHooks();
 
   const configService = app.get(ConfigService);
