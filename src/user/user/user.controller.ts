@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse,HttpException, Redirect, Inject, UseFilters, ParseIntPipe, Body, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Req, Param, Query, Res, Header, HttpCode, HttpRedirectResponse,HttpException, Redirect, Inject, UseFilters, ParseIntPipe, Body, UsePipes, UseInterceptors } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { request } from 'http';
 import { UserService } from './user.service';
@@ -11,6 +11,7 @@ import { ValidationFilter } from 'src/validation/validation.filter';
 import { ValidationPipe } from 'src/validation/validation.pipe';
 import { loginUserRequestValidation } from 'src/model/login.model';
 import { LoginUserRequest } from './../../model/login.model';
+import { TimeInterceptor } from 'src/time/time.interceptor';
 
 @Controller('/api/users')
 export class UserController {
@@ -28,8 +29,12 @@ export class UserController {
     @UsePipes(new ValidationPipe(loginUserRequestValidation))
     @UseFilters(ValidationFilter)
     @Post('/Login')
+    @Header('Content-Tyoe', 'application/json')
+    @UseInterceptors(TimeInterceptor)
     login(@Query('name') name: string, @Body() request: LoginUserRequest){
-        return `Hello ${request.username}`;
+        return {
+            data: `Hello ${request.username}`
+        };
     }
 
     @Get('/connection')
